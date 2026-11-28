@@ -58,7 +58,7 @@ public class UsuarioService : IUsuarioService
         {
             throw new ArgumentException("El nombre de usuario es obligatorio");
         }
-        if (string.IsNullOrWhiteSpace(usuario.Correo))
+        if (string.IsNullOrWhiteSpace(usuario.Email))
         {
             throw new ArgumentException("El correo del usuario es obligatorio");
         }        

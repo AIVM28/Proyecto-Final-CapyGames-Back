@@ -49,13 +49,13 @@ public class PedidoService : IPedidoService
         return _repository.Eliminar(id);
     }
 
-    private float CalcularCostoEnvio(Pedido pedido)
+    private decimal CalcularCostoEnvio(Pedido pedido)
     {
-        if (pedido.Subtotal < 999)
+        if (pedido.Subtotal < 999m)
         {
-            return 99f;
+            return 99m;
         }
 
-        return 0f;
+        return 0m;
     }
 }

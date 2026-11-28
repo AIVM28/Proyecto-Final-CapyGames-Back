@@ -2,11 +2,20 @@ namespace Proyecto_Final_CapyGames_Back.Models
 {
     public class DetallePedido
     {
-        public int Id { set; get; }
-        public int PedidoId { set; get; }
-        public int ProductoId { set; get; }
-        public int Cantidad { set; get; }
-        public float PrecioUnitario { set; get; }
-        public float Subtotal { set; get; }
+        public int Id { get; set; }
+
+        public int PedidoId { get; set; }
+
+        public Pedido? Pedido { get; set; }
+
+        public int ProductoId { get; set; }
+
+        public Producto? Producto { get; set; }
+
+        public int Cantidad { get; set; }
+
+        public decimal PrecioUnitario { get; set; }
+
+        public decimal Subtotal { get; set; }
     }
 }
