@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Configurar Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 //PosgreSQL
