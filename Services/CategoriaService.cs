@@ -13,9 +13,11 @@ public class CategoriaService : ICategoriaService
     }
 
     public List<Categoria> ObtenerTodas()
-    {
-        return _repository.ObtenerTodas();
-    }
+{
+    return _repository.ObtenerTodas()
+        .Where(c => c.Activa)
+        .ToList();
+}
 
     public Categoria? ObtenerPorId(int id)
     {
@@ -41,16 +43,21 @@ public class CategoriaService : ICategoriaService
         return _repository.Actualizar(id, Categoria);
     }
 
+
     public bool Eliminar(int id)
     {
         var existente = _repository.ObtenerPorId(id);
+
         if (existente == null)
         {
             return false;
         }
 
-        return _repository.Eliminar(id);
-    }
+        existente.Activa = false;
+
+        return _repository.Actualizar(id, existente);
+}
+
 
     private void ValidarCategoria(Categoria Categoria)
     {

@@ -186,12 +186,16 @@ namespace Proyecto_Final_CapyGames_Back.Data
             // DETALLE CARRITO
             // ==========================================
 
+
             modelBuilder.Entity<DetalleCarrito>(entity =>
             {
                 entity.HasKey(d => d.Id);
 
                 entity.Property(d => d.Cantidad)
                     .IsRequired();
+
+                entity.HasIndex(d => new { d.CarritoId, d.ProductoId })
+                    .IsUnique();
 
                 entity.HasOne(d => d.Carrito)
                     .WithMany(c => c.DetallesCarrito)
@@ -205,6 +209,7 @@ namespace Proyecto_Final_CapyGames_Back.Data
                     .IsRequired()
                     .OnDelete(DeleteBehavior.Restrict);
             });
+
 
             // ==========================================
             // PEDIDO
