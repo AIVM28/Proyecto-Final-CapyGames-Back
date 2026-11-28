@@ -48,10 +48,15 @@ builder.Services.AddScoped<IDetallePedidoRepository, DetallePedidoJsonRepository
 //     UsuarioPostgreSqlRepository
 // >();
 
-builder.Services.AddScoped<
-    IAuthService,
-    AuthService
->();
+// Servicios de la aplicación
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICarritoService, CarritoService>();
+builder.Services.AddScoped<ICategoriaService, CategoriaService>();
+builder.Services.AddScoped<IDetalleCarritoService, DetalleCarritoService>();
+builder.Services.AddScoped<IDetallePedidoService, DetallePedidoService>();
+builder.Services.AddScoped<IDireccionService, DireccionService>();
+builder.Services.AddScoped<IProductoService, ProductoService>();
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 
 
 var jwt = builder.Configuration.GetSection("Jwt");
