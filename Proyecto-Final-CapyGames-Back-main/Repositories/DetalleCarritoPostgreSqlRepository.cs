@@ -9,7 +9,7 @@ public class DetalleCarritoPostgreSqlRepository : IDetalleCarritoRepository
    {
        _context = context;
    }
-   public List<DetalleCarrito> ObtenerTodas()
+   public List<DetalleCarrito> ObtenerTodos()
    {
        return _context.DetalleCarritos.ToList();
    }

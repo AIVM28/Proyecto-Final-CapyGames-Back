@@ -4,7 +4,7 @@ namespace Proyecto_Final_CapyGames_Back.Repositories;
 
 public interface IDetalleCarritoRepository
 {
-    List<DetalleCarrito> ObtenerTodas();
+    List<DetalleCarrito> ObtenerTodos();
     DetalleCarrito? ObtenerPorId(int id);
     DetalleCarrito Agregar(DetalleCarrito nuevoDetalleCarrito);
     bool Actualizar(int id, DetalleCarrito detalleCarrito);

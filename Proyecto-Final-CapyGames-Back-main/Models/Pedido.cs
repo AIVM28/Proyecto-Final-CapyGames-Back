@@ -11,6 +11,7 @@ namespace Proyecto_Final_CapyGames_Back.Models
         public float CostoEnvio { set; get; }
         public float Total { set; get; }
         public string MetodoPago { set; get; } = "";
-        public bool Estado { set; get; }
+        public string Estado { set; get; } = "";
+        public float ProductoCosto{ set; get; } 
     }
 }
