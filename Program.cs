@@ -1,4 +1,3 @@
-
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +14,6 @@ builder.Services.AddControllers();
 // Configurar Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
 
@@ -34,15 +32,20 @@ builder.Services.AddDbContext<PostgreSqlDbContext>(options =>
 );
 
 
-builder.Services.AddScoped<
-    IUsuarioRepository,
-    UsuarioPostgreSqlRepository
->();
-
-builder.Services.AddScoped<
-    IAuthService,
-    AuthService
->();
+builder.Services.AddScoped<IUsuarioRepository,UsuarioPostgreSqlRepository>();
+builder.Services.AddScoped<IAuthService,AuthService>();
+builder.Services.AddScoped<ICategoriaRepository,CategoriaPostgreSqlRepository>();
+builder.Services.AddScoped<ICategoriaService,CategoriaService>();
+builder.Services.AddScoped<IProductoRepository,ProductoPostgreSqlRepository>();
+builder.Services.AddScoped<IProductoService,ProductoService>();
+builder.Services.AddScoped<IDireccionService,DireccionService>();
+builder.Services.AddScoped<ICarritoRepository,CarritoPostgreSqlRepository>();
+builder.Services.AddScoped<ICarritoService,CarritoService>();
+builder.Services.AddScoped<IPedidoRepository,PedidoPostgreSqlRepository>();
+builder.Services.AddScoped<IPedidoService,PedidoService>();
+builder.Services.AddScoped<IDireccionRepository,DireccionPostgreSqlRepository>();
+builder.Services.AddScoped<IDetalleCarritoRepository,DetalleCarritoPostgreSqlRepository>();
+builder.Services.AddScoped<IDetalleCarritoService,DetalleCarritoService>();
 
 
 var jwt = builder.Configuration.GetSection("Jwt");

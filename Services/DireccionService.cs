@@ -12,51 +12,114 @@ public class DireccionService : IDireccionService
         _repository = repository;
     }
 
-    public List<Direccion> ObtenerTodas()
+    // Consultar direcciones del usuario
+    public List<Direccion> ObtenerPorUsuario(int usuarioId)
     {
-        return _repository.ObtenerTodas();
+        return _repository.ObtenerPorUsuario(usuarioId);
     }
 
-    public Direccion? ObtenerPorId(int id)
+    // Agregar dirección
+    public Direccion Agregar(int usuarioId, Direccion nuevaDireccion)
     {
-        return _repository.ObtenerPorId(id);
+        ValidarDireccion(nuevaDireccion);
+
+        nuevaDireccion.Id = 0;
+        nuevaDireccion.UsuarioId = usuarioId;
+        nuevaDireccion.Usuario = null;
+
+        if (nuevaDireccion.Predeterminada)
+        {
+            DesmarcarPredeterminadas(usuarioId);
+        }
+
+        return _repository.Agregar(nuevaDireccion);
     }
 
-    public Direccion Agregar(Direccion nuevoDireccion)
+    // Actualizar dirección
+    public bool Actualizar(int id, int usuarioId, Direccion direccion)
     {
-        ValidarDireccion(nuevoDireccion);
+        var existente = _repository.ObtenerPorId(id, usuarioId);
 
-        return _repository.Agregar(nuevoDireccion);
-    }
-
-    public bool Actualizar(int id, Direccion Direccion)
-    {
-        var existente = _repository.ObtenerPorId(id);
         if (existente == null)
         {
             return false;
         }
-        ValidarDireccion(Direccion);
 
-        return _repository.Actualizar(id, Direccion);
+        ValidarDireccion(direccion);
+
+        if (direccion.Predeterminada)
+        {
+            DesmarcarPredeterminadas(usuarioId, id);
+        }
+
+        existente.Calle = direccion.Calle;
+        existente.NumeroExterior = direccion.NumeroExterior;
+        existente.NumeroInterior = direccion.NumeroInterior;
+        existente.Colonia = direccion.Colonia;
+        existente.Ciudad = direccion.Ciudad;
+        existente.Estado = direccion.Estado;
+        existente.CodigoPostal = direccion.CodigoPostal;
+        existente.Referencias = direccion.Referencias;
+        existente.Predeterminada = direccion.Predeterminada;
+
+        return _repository.Actualizar(id, usuarioId, existente);
     }
 
-    public bool Eliminar(int id)
+    // Eliminar dirección
+    public bool Eliminar(int id, int usuarioId)
     {
-        var existente = _repository.ObtenerPorId(id);
+        var existente = _repository.ObtenerPorId(id, usuarioId);
+
         if (existente == null)
         {
             return false;
         }
 
-        return _repository.Eliminar(id);
+        return _repository.Eliminar(id, usuarioId);
     }
 
-    private void ValidarDireccion(Direccion Direccion)
+    // Validar información de dirección
+    private void ValidarDireccion(Direccion direccion)
     {
-        if (string.IsNullOrWhiteSpace(Direccion.Calle))
+        if (string.IsNullOrWhiteSpace(direccion.Calle))
+            throw new ArgumentException("La calle es obligatoria.");
+
+        if (string.IsNullOrWhiteSpace(direccion.NumeroExterior))
+            throw new ArgumentException("El número exterior es obligatorio.");
+
+        if (string.IsNullOrWhiteSpace(direccion.Colonia))
+            throw new ArgumentException("La colonia es obligatoria.");
+
+        if (string.IsNullOrWhiteSpace(direccion.Ciudad))
+            throw new ArgumentException("La ciudad es obligatoria.");
+
+        if (string.IsNullOrWhiteSpace(direccion.Estado))
+            throw new ArgumentException("El estado es obligatorio.");
+
+        if (string.IsNullOrWhiteSpace(direccion.CodigoPostal))
+            throw new ArgumentException("El código postal es obligatorio.");
+    }
+
+    // Garantizar una sola dirección predeterminada
+    private void DesmarcarPredeterminadas(
+        int usuarioId,
+        int? direccionExcluir = null)
+    {
+        var direcciones = _repository.ObtenerPorUsuario(usuarioId);
+
+        foreach (var direccion in direcciones)
         {
-            throw new ArgumentException("El nombre de la calle de la Direccion es obligatorio");
+            if (direccion.Predeterminada &&
+                direccion.Id != direccionExcluir)
+            {
+                direccion.Predeterminada = false;
+
+                _repository.Actualizar(
+                    direccion.Id,
+                    usuarioId,
+                    direccion
+                );
+            }
         }
     }
 }

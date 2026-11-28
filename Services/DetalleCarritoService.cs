@@ -13,35 +13,29 @@ public class DetalleCarritoService : IDetalleCarritoService
         _repository = repository;
     }
 
-    public List<DetalleCarrito> ObtenerTodos()
+    public DetalleCarrito? ObtenerPorProducto(int carritoId, int productoId)
     {
-        return _repository.ObtenerTodas();
+        return _repository.ObtenerPorProducto(carritoId, productoId);
     }
 
-    public DetalleCarrito? ObtenerPorId(int id)
+    public DetalleCarrito? ObtenerPorId(int id, int carritoId)
     {
-        return _repository.ObtenerPorId(id);
+        return _repository.ObtenerPorId(id, carritoId);
     }
 
-    public DetalleCarrito Agregar(DetalleCarrito nuevoDetalleCarrito)
+    public DetalleCarrito Agregar(DetalleCarrito nuevoDetalle)
     {
-        return _repository.Agregar(nuevoDetalleCarrito);
+        return _repository.Agregar(nuevoDetalle);
     }
 
-    public bool Actualizar(int id, DetalleCarrito detalleCarrito)
+    public bool ActualizarCantidad(int id, int carritoId, int cantidad)
     {
-        return _repository.Actualizar(id, detalleCarrito);
+        return _repository.ActualizarCantidad(id, carritoId, cantidad);
     }
 
-    public bool Eliminar(int id)
+    public bool Eliminar(int id, int carritoId)
     {
-        var existente = _repository.ObtenerPorId(id);
-
-        if (existente == null)
-        {
-            return false;
-        }
-
-        return _repository.Eliminar(id);
+        return _repository.Eliminar(id, carritoId);
     }
 }
+

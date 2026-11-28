@@ -1,12 +1,21 @@
-using Proyecto_Final_CapyGames_Back.Models;
+
+using Proyecto_Final_CapyGames_Back.DTOs;
 
 namespace Proyecto_Final_CapyGames_Back.Services;
 
 public interface IPedidoService
 {
-    List<Pedido> ObtenerTodos();
-    Pedido? ObtenerPorId(int id);
-    Pedido Agregar(Pedido nuevoPedido);
-    bool Actualizar(int id, Pedido pedido);
-    bool Eliminar(int id);
+    PedidoRespuestaDto CrearPedido(int usuarioId, CrearPedidoDto pedido);
+
+    List<PedidoRespuestaDto> ObtenerPorUsuario(int usuarioId);
+
+    PedidoRespuestaDto? ObtenerDetalle(int id, int usuarioId);
+
+    bool Cancelar(int id, int usuarioId);
+
+    List<PedidoRespuestaDto> ObtenerTodosAdmin(string? estado);
+
+    bool ActualizarEstadoAdmin(int id, string estado);
+
+    ResumenAdminDto ObtenerResumenAdmin();
 }
