@@ -480,3 +480,7 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Archivos JSON generados durante pruebas
+Data/JsonData/*.json
+Data/JsonData/*.tmp
