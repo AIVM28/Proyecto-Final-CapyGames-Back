@@ -22,20 +22,23 @@ public class CarritoJsonRepository : JsonRepositoryBase<Carrito>, ICarritoReposi
     {
     }
 
-    public List<Carrito> ObtenerTodos() => ObtenerTodosBase();
-
-    public Carrito? ObtenerPorId(int id) => ObtenerPorIdBase(id);
-
-    public Carrito Agregar(Carrito nuevoCarrito) => AgregarBase(nuevoCarrito);
-
-    public bool Actualizar(int id, Carrito carrito)
+    public Carrito? ObtenerPorUsuario(int usuarioId)
     {
-        return ActualizarBase(id, existente =>
-        {
-            existente.UsuarioId = carrito.UsuarioId;
-            existente.FechaActualizacion = carrito.FechaActualizacion;
-        });
+        return BuscarBase(carrito => carrito.UsuarioId == usuarioId);
     }
 
-    public bool Eliminar(int id) => EliminarBase(id);
+    public Carrito Agregar(Carrito nuevoCarrito)
+    {
+        nuevoCarrito.Usuario = null;
+        nuevoCarrito.DetallesCarrito = new List<DetalleCarrito>();
+        return AgregarBase(nuevoCarrito);
+    }
+
+    public bool ActualizarFecha(int id, DateTime fechaActualizacion)
+    {
+        return ActualizarBase(id, carrito =>
+        {
+            carrito.FechaActualizacion = fechaActualizacion;
+        });
+    }
 }

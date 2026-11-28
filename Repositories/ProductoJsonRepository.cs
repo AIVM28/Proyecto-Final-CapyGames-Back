@@ -27,11 +27,41 @@ public class ProductoJsonRepository : JsonRepositoryBase<Producto>, IProductoRep
     {
     }
 
-    public List<Producto> ObtenerTodos() => ObtenerTodosBase();
+    public List<Producto> ObtenerTodos(
+        int? categoriaId = null,
+        string? nombre = null)
+    {
+        IEnumerable<Producto> consulta = ObtenerTodosBase()
+            .Where(producto => producto.Activo);
+
+        if (categoriaId.HasValue)
+        {
+            consulta = consulta.Where(producto =>
+                producto.CategoriaId == categoriaId.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(nombre))
+        {
+            var termino = nombre.Trim();
+
+            consulta = consulta.Where(producto =>
+                producto.Nombre.Contains(
+                    termino,
+                    StringComparison.OrdinalIgnoreCase));
+        }
+
+        return consulta
+            .OrderBy(producto => producto.Nombre)
+            .ToList();
+    }
 
     public Producto? ObtenerPorId(int id) => ObtenerPorIdBase(id);
 
-    public Producto Agregar(Producto nuevoProducto) => AgregarBase(nuevoProducto);
+    public Producto Agregar(Producto nuevoProducto)
+    {
+        nuevoProducto.Categoria = null;
+        return AgregarBase(nuevoProducto);
+    }
 
     public bool Actualizar(int id, Producto producto)
     {
@@ -48,5 +78,12 @@ public class ProductoJsonRepository : JsonRepositoryBase<Producto>, IProductoRep
         });
     }
 
-    public bool Eliminar(int id) => EliminarBase(id);
+    // Se conserva el comportamiento de PostgreSQL: baja lógica.
+    public bool Eliminar(int id)
+    {
+        return ActualizarBase(id, existente =>
+        {
+            existente.Activo = false;
+        });
+    }
 }

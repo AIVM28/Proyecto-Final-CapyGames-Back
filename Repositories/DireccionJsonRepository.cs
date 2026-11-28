@@ -29,28 +29,49 @@ public class DireccionJsonRepository : JsonRepositoryBase<Direccion>, IDireccion
     {
     }
 
-    public List<Direccion> ObtenerTodas() => ObtenerTodosBase();
-
-    public Direccion? ObtenerPorId(int id) => ObtenerPorIdBase(id);
-
-    public Direccion Agregar(Direccion nuevaDireccion) => AgregarBase(nuevaDireccion);
-
-    public bool Actualizar(int id, Direccion direccion)
+    public List<Direccion> ObtenerPorUsuario(int usuarioId)
     {
-        return ActualizarBase(id, existente =>
-        {
-            existente.UsuarioId = direccion.UsuarioId;
-            existente.Calle = direccion.Calle;
-            existente.NumeroExterior = direccion.NumeroExterior;
-            existente.NumeroInterior = direccion.NumeroInterior;
-            existente.Colonia = direccion.Colonia;
-            existente.Ciudad = direccion.Ciudad;
-            existente.Estado = direccion.Estado;
-            existente.CodigoPostal = direccion.CodigoPostal;
-            existente.Referencias = direccion.Referencias;
-            existente.Predeterminada = direccion.Predeterminada;
-        });
+        return ObtenerTodosBase()
+            .Where(direccion => direccion.UsuarioId == usuarioId)
+            .ToList();
     }
 
-    public bool Eliminar(int id) => EliminarBase(id);
+    public Direccion? ObtenerPorId(int id, int usuarioId)
+    {
+        return BuscarBase(direccion =>
+            direccion.Id == id &&
+            direccion.UsuarioId == usuarioId);
+    }
+
+    public Direccion Agregar(Direccion nuevaDireccion)
+    {
+        nuevaDireccion.Usuario = null;
+        return AgregarBase(nuevaDireccion);
+    }
+
+    public bool Actualizar(int id, int usuarioId, Direccion direccion)
+    {
+        return ActualizarBase(
+            id,
+            existente => existente.UsuarioId == usuarioId,
+            existente =>
+            {
+                existente.Calle = direccion.Calle;
+                existente.NumeroExterior = direccion.NumeroExterior;
+                existente.NumeroInterior = direccion.NumeroInterior;
+                existente.Colonia = direccion.Colonia;
+                existente.Ciudad = direccion.Ciudad;
+                existente.Estado = direccion.Estado;
+                existente.CodigoPostal = direccion.CodigoPostal;
+                existente.Referencias = direccion.Referencias;
+                existente.Predeterminada = direccion.Predeterminada;
+            });
+    }
+
+    public bool Eliminar(int id, int usuarioId)
+    {
+        return EliminarBase(
+            id,
+            direccion => direccion.UsuarioId == usuarioId);
+    }
 }

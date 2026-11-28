@@ -121,12 +121,37 @@ public abstract class JsonRepositoryBase<T> where T : class
         }
     }
 
-    protected bool EliminarBase(int id)
+    protected bool ActualizarBase(int id, Func<T, bool> criterio, Action<T> aplicarCambios)
     {
+        ArgumentNullException.ThrowIfNull(criterio);
+        ArgumentNullException.ThrowIfNull(aplicarCambios);
+
         lock (_fileLock)
         {
             var elementos = LeerTodos();
-            var existente = elementos.FirstOrDefault(item => _getId(item) == id);
+            var existente = elementos.FirstOrDefault(item =>
+                _getId(item) == id && criterio(item));
+
+            if (existente is null)
+            {
+                return false;
+            }
+
+            aplicarCambios(existente);
+            GuardarTodos(elementos);
+            return true;
+        }
+    }
+
+    protected bool EliminarBase(int id, Func<T, bool> criterio)
+    {
+        ArgumentNullException.ThrowIfNull(criterio);
+
+        lock (_fileLock)
+        {
+            var elementos = LeerTodos();
+            var existente = elementos.FirstOrDefault(item =>
+                _getId(item) == id && criterio(item));
 
             if (existente is null)
             {
@@ -136,6 +161,21 @@ public abstract class JsonRepositoryBase<T> where T : class
             elementos.Remove(existente);
             GuardarTodos(elementos);
             return true;
+        }
+    }
+
+    protected bool EliminarBase(int id)
+    {
+        return EliminarBase(id, static _ => true);
+    }
+
+    protected void GuardarTodosBase(List<T> elementos)
+    {
+        ArgumentNullException.ThrowIfNull(elementos);
+
+        lock (_fileLock)
+        {
+            GuardarTodos(elementos);
         }
     }
 
