@@ -1,41 +1,139 @@
+
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Proyecto_Final_CapyGames_Back.Data;
+using Proyecto_Final_CapyGames_Back.Repositories;
+using Proyecto_Final_CapyGames_Back.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+// Registrar controladores
+builder.Services.AddControllers();
+
+// Configurar Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddControllers();
+
 builder.Services.AddOpenApi();
+
+var connectionString = builder.Configuration
+    .GetConnectionString("PostgreSQLConnection");
+
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException(
+        "No se encontró la cadena de conexión PostgreSQLConnection."
+    );
+}
+
+builder.Services.AddDbContext<PostgreSqlDbContext>(options =>
+    options.UseNpgsql(connectionString)
+);
+
+
+builder.Services.AddScoped<
+    IUsuarioRepository,
+    UsuarioPostgreSqlRepository
+>();
+
+builder.Services.AddScoped<
+    IAuthService,
+    AuthService
+>();
+
+
+var jwt = builder.Configuration.GetSection("Jwt");
+
+var keyBase64 = jwt["Key"]
+    ?? throw new InvalidOperationException(
+        "Falta configurar Jwt:Key."
+    );
+
+byte[] key;
+
+try
+{
+    key = Convert.FromBase64String(keyBase64);
+}
+catch (FormatException)
+{
+    throw new InvalidOperationException(
+        "Jwt:Key no contiene una clave válida en Base64."
+    );
+}
+
+if (key.Length < 32)
+{
+    throw new InvalidOperationException(
+        "La clave JWT debe contener al menos 32 bytes."
+    );
+}
+
+var issuer = jwt["Issuer"]
+    ?? throw new InvalidOperationException(
+        "Falta configurar Jwt:Issuer."
+    );
+
+var audience = jwt["Audience"]
+    ?? throw new InvalidOperationException(
+        "Falta configurar Jwt:Audience."
+    );
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.MapInboundClaims = true;
+
+        options.TokenValidationParameters =
+            new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = issuer,
+
+                ValidateAudience = true,
+                ValidAudience = audience,
+
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+
+                ValidateLifetime = true,
+                RequireExpirationTime = true,
+                RequireSignedTokens = true,
+
+                ValidAlgorithms = new[]
+                {
+                    SecurityAlgorithms.HmacSha256
+                },
+
+                ClockSkew = TimeSpan.Zero
+            };
+    });
+
+
+
+builder.Services.AddAuthorization();
+
+
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Habilitar Swagger en desarrollo
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+app.UseAuthentication();
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.UseAuthorization();
+
+app.MapControllers();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
