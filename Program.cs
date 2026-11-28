@@ -9,9 +9,6 @@ using Proyecto_Final_CapyGames_Back.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Registrar controladores
-builder.Services.AddControllers();
-
 // Configurar Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -19,25 +16,39 @@ builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
 
-var connectionString = builder.Configuration
-    .GetConnectionString("PostgreSQLConnection");
+//PosgreSQL
+// var connectionString = builder.Configuration
+//     .GetConnectionString("PostgreSQLConnection");
 
-if (string.IsNullOrWhiteSpace(connectionString))
-{
-    throw new InvalidOperationException(
-        "No se encontró la cadena de conexión PostgreSQLConnection."
-    );
-}
-
-builder.Services.AddDbContext<PostgreSqlDbContext>(options =>
-    options.UseNpgsql(connectionString)
-);
+// if (string.IsNullOrWhiteSpace(connectionString))
+// {
+//     throw new InvalidOperationException(
+//         "No se encontró la cadena de conexión PostgreSQLConnection."
+//     );
+// }
 
 
-builder.Services.AddScoped<
-    IUsuarioRepository,
-    UsuarioPostgreSqlRepository
->();
+//JSON
+builder.Services.AddScoped<IUsuarioRepository, UsuarioJsonRepository>();
+builder.Services.AddScoped<ICategoriaRepository, CategoriaJsonRepository>();
+builder.Services.AddScoped<IProductoRepository, ProductoJsonRepository>();
+builder.Services.AddScoped<IDireccionRepository, DireccionJsonRepository>();
+builder.Services.AddScoped<ICarritoRepository, CarritoJsonRepository>();
+builder.Services.AddScoped<IDetalleCarritoRepository, DetalleCarritoJsonRepository>();
+builder.Services.AddScoped<IPedidoRepository, PedidoJsonRepository>();
+builder.Services.AddScoped<IDetallePedidoRepository, DetallePedidoJsonRepository>();
+
+//PosgreSQL
+// builder.Services.AddDbContext<PostgreSqlDbContext>(options =>
+//     options.UseNpgsql(connectionString)
+// );
+
+
+//PosgreSQL
+// builder.Services.AddScoped<
+//     IUsuarioRepository,
+//     UsuarioPostgreSqlRepository
+// >();
 
 builder.Services.AddScoped<
     IAuthService,
